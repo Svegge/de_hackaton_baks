@@ -1,1 +1,0 @@
-select 'helloworld' as helloworld;
