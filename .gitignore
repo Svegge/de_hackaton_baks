@@ -49,6 +49,7 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 !**.keep
-logs/
+logs/*
+!logs/.keep
 /project/files/*
 !/project/files/.keep
