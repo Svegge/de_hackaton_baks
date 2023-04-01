@@ -1,0 +1,1 @@
+TRUNCATE TABLE dds.d_timestamps CASCADE;

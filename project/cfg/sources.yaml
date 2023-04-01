@@ -1,0 +1,6 @@
+files: [
+  'https://storage.yandexcloud.net/hackathon/events-2022-Sep-30-2134.json.zip',
+  'https://storage.yandexcloud.net/hackathon/events-2022-Sep-30-2134.json.zip.md5',
+  'https://storage.yandexcloud.net/hackathon/events-2022-Sep-30-2134.parquet.gz',
+  'https://storage.yandexcloud.net/hackathon/events-2022-Sep-30-2134.parquet.gz.md5',
+]
