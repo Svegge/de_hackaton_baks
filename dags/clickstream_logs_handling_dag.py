@@ -13,6 +13,7 @@ sys.path.insert(0, '/lessons/project/')
 from cfg.funcs import load_yaml
 from stg.load_pg_stg import load_pg_stg
 from ddl.schema_init import init_schema
+from dds.pg_insert import insert_data
 
 log = logging.getLogger(__name__)
 
@@ -71,7 +72,16 @@ def clickstream_logs_handling_dag():
         } 
     )
 
-    clean_src_files_task >> file_get_tasks >> tg1 >> execute_ddl_task >> load_pg_stg_task
+    load_pg_dds_task = PythonOperator( 
+        task_id='load_pg_dds', 
+        python_callable=insert_data, 
+        op_kwargs={
+            'pg_hook': pg_hook,
+            'log': log,
+        } 
+    )
+
+    clean_src_files_task >> file_get_tasks >> tg1 >> execute_ddl_task >> load_pg_stg_task >> load_pg_dds_task
 
 
 clickstream_logs_handling_dag  = clickstream_logs_handling_dag()
