@@ -1,4 +1,5 @@
---drop materialized view cdm.v_dm_product_purchase;
+drop materialized view if exists cdm.v_dm_product_purchase;
+
 create materialized view if not exists cdm.v_dm_product_purchase as 
 --
 with t as (

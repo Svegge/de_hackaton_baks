@@ -1,3 +1,5 @@
+drop materialized view if exists cdm.v_dm_events_by_hour;
+
 create materialized view if not exists cdm.v_dm_events_by_hour as 
 --
 select t."year", t."month", t."day", t."hour", date_trunc('hour', t.ts) dt_hour
