@@ -5,9 +5,9 @@
  */
 
 --Распределение событий по часам
-drop table if exists cdm.dm_events_by_hour;
+-- drop table if exists cdm.dm_events_by_hour;
 --
-create table cdm.dm_events_by_hour (
+create table if not exists cdm.dm_events_by_hour (
 	id serial not null primary key, -- идентификатор записи
 	hour_d integer not null,-- час
 	event_type varchar not null, -- событие
@@ -22,9 +22,9 @@ create table cdm.dm_events_by_hour (
 --
 --предполагаем что при событии event_type = 'purchase' - page_url_path - это наименование товара
 --в витрине получаем час, наименование товара и кол-во покупок(кликов)
-drop table if exists cdm.dm_product_purchase;
+-- drop table if exists cdm.dm_product_purchase;
 --
-create table cdm.dm_product_purchase (
+create table if not exists cdm.dm_product_purchase (
 	id serial not null primary key, -- идентификатор записи
 	hour_d integer not null,-- час
 	purchase_product varchar not null, -- товара
@@ -36,9 +36,9 @@ create table cdm.dm_product_purchase (
 
 --=======================
 --топ-10 посещённых страниц, с которых был переход в покупку — список ссылок с количеством покупок
-drop table if exists cdm.dm_top10_referers;
+-- drop table if exists cdm.dm_top10_referers;
 --
-create table cdm.dm_top10_referers (
+create table if not exists cdm.dm_top10_referers (
 	id serial not null primary key, -- идентификатор записи
 	referer_url varchar not null, -- ссылка
 	purchase_cnt integer not null -- кол-во покупок

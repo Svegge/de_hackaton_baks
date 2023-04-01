@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 import pendulum
 import pandas as pd
 from airflow.operators.bash import BashOperator
@@ -11,6 +12,9 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 sys.path.insert(0, '/lessons/project/')
 from cfg.funcs import load_yaml
 from stg.load_pg_stg import load_pg_stg
+from ddl.schema_init import init_schema
+
+log = logging.getLogger(__name__)
 
 postgres_conn_id = 'postgres_baks_project'
 file_path = "/lessons/project/files/"
@@ -57,8 +61,17 @@ def clickstream_logs_handling_dag():
             'pg_hook': pg_hook,
         } 
     )
-    clean_src_files_task >> file_get_tasks >> tg1 >> load_pg_stg_task
-    # clean_src_files_task >> file_get_tasks >> tg1
+
+    execute_ddl_task = PythonOperator( 
+        task_id='execute_ddl', 
+        python_callable=init_schema, 
+        op_kwargs={
+            'pg_hook': pg_hook,
+            'log': log,
+        } 
+    )
+
+    clean_src_files_task >> file_get_tasks >> tg1 >> execute_ddl_task >> load_pg_stg_task
 
 
 clickstream_logs_handling_dag  = clickstream_logs_handling_dag()
