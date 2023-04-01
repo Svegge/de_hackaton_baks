@@ -50,3 +50,5 @@ coverage.xml
 docs/_build/
 !**.keep
 logs/
+/project/files/*
+!/project/files/.keep
