@@ -1,0 +1,3 @@
+clean_src_files_task: 'find /lessons/project/files -mindepth 1 -not -path "*/.keep*" -delete'
+unpack_gz_files_task: 'find . -name "*.gz" | while read filename; do gzip -d "`dirname "$filename"`" "$filename"; done;'
+unpack_zip_files_task: 'cd /lessons/project/files && find . -name "*.zip*" | while read filename; do unzip -o -d "`dirname "$filename"`" "$filename" && rm $filename; done;'
