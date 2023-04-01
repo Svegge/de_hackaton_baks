@@ -6,6 +6,7 @@ import pandas as pd
 from airflow.operators.bash import BashOperator
 from airflow.utils.task_group import TaskGroup
 from airflow.operators.python import PythonOperator
+from airflow.operators.dummy_operator import DummyOperator
 from airflow.decorators import dag, task
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 
@@ -14,6 +15,7 @@ from cfg.funcs import load_yaml
 from stg.load_pg_stg import load_pg_stg
 from ddl.schema_init import init_schema
 from dds.pg_insert import insert_data
+from cdm.pg_insert import insert_data as cdm_insert_data
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +27,7 @@ bash_commands = load_yaml('bash_commands')
 pg_hook = PostgresHook(postgres_conn_id)
 
 
-@dag(schedule_interval=None,
+@dag(schedule_interval=None, # '37 */1 * * *',
      start_date=pendulum.parse('2023-03-31')
      )
 def clickstream_logs_handling_dag():
@@ -51,7 +53,14 @@ def clickstream_logs_handling_dag():
                 task_id=f'unpack_zip_files',
                 bash_command=bash_commands.get('unpack_zip_files_task')
             )
-
+    start_task = DummyOperator(
+            task_id="start",
+            trigger_rule="all_success",
+        )
+    end_task = DummyOperator(
+            task_id="end",
+            trigger_rule="all_success",
+        )
     load_pg_stg_task = PythonOperator( 
         task_id='load_pg_stg', 
         python_callable=load_pg_stg, 
@@ -81,7 +90,16 @@ def clickstream_logs_handling_dag():
         } 
     )
 
-    clean_src_files_task >> file_get_tasks >> tg1 >> execute_ddl_task >> load_pg_stg_task >> load_pg_dds_task
+    load_pg_cdm_task = PythonOperator( 
+        task_id='load_pg_cdm', 
+        python_callable=cdm_insert_data, 
+        op_kwargs={
+            'pg_hook': pg_hook,
+            'log': log,
+        } 
+    )   
+
+    start_task >> clean_src_files_task >> file_get_tasks >> tg1 >> execute_ddl_task >> load_pg_stg_task >> load_pg_dds_task >> load_pg_cdm_task >> end_task
 
 
 clickstream_logs_handling_dag  = clickstream_logs_handling_dag()
